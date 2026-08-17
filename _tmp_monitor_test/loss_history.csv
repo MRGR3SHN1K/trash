@@ -1,0 +1,6 @@
+kind,global_step,epoch,value,aux_value
+train,1,1,1.0,0.5
+train,2,1,0.5,0.5
+train,3,1,0.3333333333333333,0.5
+valid,3,1,0.4,0.75
+epoch_train,3,1,0.5,12.3

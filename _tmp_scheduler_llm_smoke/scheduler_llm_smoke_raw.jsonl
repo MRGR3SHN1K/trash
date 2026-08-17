@@ -1,0 +1,1 @@
+{"ok": false, "stage": "connect", "ws_url": "ws://10.233.3.148:9000/ws", "model": "Llama-3_3-Nemotron-Super-49B-v1_5", "error": "timed out during opening handshake"}

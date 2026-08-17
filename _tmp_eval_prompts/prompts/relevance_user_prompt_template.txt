@@ -1,0 +1,16 @@
+Оцени соответствие карточек товара закупочной позиции.
+Верни только JSON формата: {"labels":[{"rank":1,"relevant":1},{"rank":2,"relevant":0}]}
+relevant = 1 только если товар полностью подходит позиции и не противоречит критичным требованиям.
+relevant = 0 если товар не подходит, подходит частично или есть сомнение.
+
+Закупочная позиция:
+- Номер ЗЗ: {position_id}
+- Наименование: {name}
+- Описание: {description}
+- Количество: {quantity} {unit}
+
+Карточки товаров:
+{rank}. title: {title}
+   description: {candidate_description}
+   features:
+   - {feature_name}: {feature_value}

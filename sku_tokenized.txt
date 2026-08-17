@@ -1,0 +1,532 @@
+Query 1: Комплекс программно-аппаратный Помещение для мероприятий б/п б/м
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+Compact view: '<bos>':STR | 'Ко':STR | 'мп':STR | 'лек':STR | 'с':STR | '▁программ':STR | 'но':STR | '-':STR | 'ап':STR | 'парат':STR | 'ный':STR | '▁По':STR | 'мещение':STR | '▁для':STR | '▁мероприятий':STR | '▁б':STR | '/':STR | 'п':STR | '▁б':STR | '/':STR | 'м':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[22438] token='Ко'
+  [STR] ids=[74623] token='мп'
+  [STR] ids=[13221] token='лек'
+  [STR] ids=[236843] token='с'
+  [STR] ids=[87510] token='▁программ'
+  [STR] ids=[924] token='но'
+  [STR] ids=[236772] token='-'
+  [STR] ids=[132508] token='ап'
+  [STR] ids=[85608] token='парат'
+  [STR] ids=[4441] token='ный'
+  [STR] ids=[7269] token='▁По'
+  [STR] ids=[200215] token='мещение'
+  [STR] ids=[4854] token='▁для'
+  [STR] ids=[151283] token='▁мероприятий'
+  [STR] ids=[1469] token='▁б'
+  [STR] ids=[236786] token='/'
+  [STR] ids=[236877] token='п'
+  [STR] ids=[1469] token='▁б'
+  [STR] ids=[236786] token='/'
+  [STR] ids=[236866] token='м'
+
+Query 2: Букет цветов живых Гвоздика
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0
+Compact view: '<bos>':STR | 'Бу':STR | 'кет':STR | '▁цветов':STR | '▁жи':STR | 'вых':STR | '▁Г':STR | 'воз':STR | 'дика':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[70162] token='Бу'
+  [STR] ids=[47647] token='кет'
+  [STR] ids=[145714] token='▁цветов'
+  [STR] ids=[9198] token='▁жи'
+  [STR] ids=[15397] token='вых'
+  [STR] ids=[6491] token='▁Г'
+  [STR] ids=[37241] token='воз'
+  [STR] ids=[78064] token='дика'
+
+Query 3: Букет цветов живых Розы
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0
+Compact view: '<bos>':STR | 'Бу':STR | 'кет':STR | '▁цветов':STR | '▁жи':STR | 'вых':STR | '▁Ро':STR | 'зы':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[70162] token='Бу'
+  [STR] ids=[47647] token='кет'
+  [STR] ids=[145714] token='▁цветов'
+  [STR] ids=[9198] token='▁жи'
+  [STR] ids=[15397] token='вых'
+  [STR] ids=[12418] token='▁Ро'
+  [STR] ids=[7608] token='зы'
+
+Query 4: Тележка сервировочная 2-х ярусная
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 1 0 0 0 0 0
+Compact view: '<bos>':STR | 'Те':STR | 'ле':STR | 'жка':STR | '▁серви':STR | 'рово':STR | 'чная':STR | '▁':STR | '2':INT | '-':STR | 'х':STR | '▁я':STR | 'рус':STR | 'ная':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[41273] token='Те'
+  [STR] ids=[1464] token='ле'
+  [STR] ids=[56540] token='жка'
+  [STR] ids=[76713] token='▁серви'
+  [STR] ids=[102456] token='рово'
+  [STR] ids=[40793] token='чная'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236778] token='2' value=2.0
+  [STR] ids=[236772] token='-'
+  [STR] ids=[236954] token='х'
+  [STR] ids=[3855] token='▁я'
+  [STR] ids=[41376] token='рус'
+  [STR] ids=[6008] token='ная'
+
+Query 5: Стол раздаточный столовый 600х605х900мм
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 1 0
+Compact view: '<bos>':STR | 'Сто':STR | 'л':STR | '▁раз':STR | 'да':STR | 'то':STR | 'чный':STR | '▁сто':STR | 'ло':STR | 'вый':STR | '▁':STR | '600':INT | 'х':STR | '605':INT | 'х':STR | '900':INT | 'мм':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[127677] token='Сто'
+  [STR] ids=[236853] token='л'
+  [STR] ids=[5007] token='▁раз'
+  [STR] ids=[1658] token='да'
+  [STR] ids=[1062] token='то'
+  [STR] ids=[30685] token='чный'
+  [STR] ids=[9905] token='▁сто'
+  [STR] ids=[1600] token='ло'
+  [STR] ids=[16155] token='вый'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236825,236771,236771] token='600' value=600.0 source_tokens=['6', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236825,236771,236810] token='605' value=605.0 source_tokens=['6', '0', '5']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236819,236771,236771] token='900' value=900.0 source_tokens=['9', '0', '0']
+  [STR] ids=[109750] token='мм'
+
+Query 6: Тележка сервировочная 3-х ярусная АЛТЭК 8/5/8
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 1
+Compact view: '<bos>':STR | 'Те':STR | 'ле':STR | 'жка':STR | '▁серви':STR | 'рово':STR | 'чная':STR | '▁':STR | '3':INT | '-':STR | 'х':STR | '▁я':STR | 'рус':STR | 'ная':STR | '▁А':STR | 'Л':STR | 'Т':STR | 'Э':STR | 'К':STR | '▁':STR | '8':INT | '/':STR | '5':INT | '/':STR | '8':INT
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[41273] token='Те'
+  [STR] ids=[1464] token='ле'
+  [STR] ids=[56540] token='жка'
+  [STR] ids=[76713] token='▁серви'
+  [STR] ids=[102456] token='рово'
+  [STR] ids=[40793] token='чная'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236800] token='3' value=3.0
+  [STR] ids=[236772] token='-'
+  [STR] ids=[236954] token='х'
+  [STR] ids=[3855] token='▁я'
+  [STR] ids=[41376] token='рус'
+  [STR] ids=[6008] token='ная'
+  [STR] ids=[4097] token='▁А'
+  [STR] ids=[237612] token='Л'
+  [STR] ids=[237318] token='Т'
+  [STR] ids=[237887] token='Э'
+  [STR] ids=[237180] token='К'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236828] token='8' value=8.0
+  [STR] ids=[236786] token='/'
+  [INT] ids=[236810] token='5' value=5.0
+  [STR] ids=[236786] token='/'
+  [INT] ids=[236828] token='8' value=8.0
+
+Query 7: _Стол раздаточный столовый 1050х610х950мм СПМР-6-5
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 0 0 0 1 0 1
+Compact view: '<bos>':STR | '_':STR | 'Сто':STR | 'л':STR | '▁раз':STR | 'да':STR | 'то':STR | 'чный':STR | '▁сто':STR | 'ло':STR | 'вый':STR | '▁':STR | '1050':INT | 'х':STR | '610':INT | 'х':STR | '950':INT | 'мм':STR | '▁СП':STR | 'М':STR | 'Р':STR | '-':STR | '6':INT | '-':STR | '5':INT
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[236779] token='_'
+  [STR] ids=[127677] token='Сто'
+  [STR] ids=[236853] token='л'
+  [STR] ids=[5007] token='▁раз'
+  [STR] ids=[1658] token='да'
+  [STR] ids=[1062] token='то'
+  [STR] ids=[30685] token='чный'
+  [STR] ids=[9905] token='▁сто'
+  [STR] ids=[1600] token='ло'
+  [STR] ids=[16155] token='вый'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236770,236771,236810,236771] token='1050' value=1050.0 source_tokens=['1', '0', '5', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236825,236770,236771] token='610' value=610.0 source_tokens=['6', '1', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236819,236810,236771] token='950' value=950.0 source_tokens=['9', '5', '0']
+  [STR] ids=[109750] token='мм'
+  [STR] ids=[94290] token='▁СП'
+  [STR] ids=[237271] token='М'
+  [STR] ids=[237321] token='Р'
+  [STR] ids=[236772] token='-'
+  [INT] ids=[236825] token='6' value=6.0
+  [STR] ids=[236772] token='-'
+  [INT] ids=[236810] token='5' value=5.0
+
+Query 8: Чехол бифлекс 80х80см Фуршет-9
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 1
+Compact view: '<bos>':STR | 'Че':STR | 'хол':STR | '▁би':STR | 'ф':STR | 'лек':STR | 'с':STR | '▁':STR | '80':INT | 'х':STR | '80':INT | 'см':STR | '▁Ф':STR | 'ур':STR | 'шет':STR | '-':STR | '9':INT
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[132159] token='Че'
+  [STR] ids=[181817] token='хол'
+  [STR] ids=[13133] token='▁би'
+  [STR] ids=[237074] token='ф'
+  [STR] ids=[13221] token='лек'
+  [STR] ids=[236843] token='с'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236828,236771] token='80' value=80.0 source_tokens=['8', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236828,236771] token='80' value=80.0 source_tokens=['8', '0']
+  [STR] ids=[91110] token='см'
+  [STR] ids=[8952] token='▁Ф'
+  [STR] ids=[22740] token='ур'
+  [STR] ids=[87262] token='шет'
+  [STR] ids=[236772] token='-'
+  [INT] ids=[236819] token='9' value=9.0
+
+Query 9: Обувница металлическая цвет черная 500х900х310мм Тип 1
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 0 0 1
+Compact view: '<bos>':STR | 'О':STR | 'бу':STR | 'в':STR | 'ница':STR | '▁метал':STR | 'личе':STR | 'ская':STR | '▁цвет':STR | '▁чер':STR | 'ная':STR | '▁':STR | '500':INT | 'х':STR | '900':INT | 'х':STR | '310':INT | 'мм':STR | '▁Ти':STR | 'п':STR | '▁':STR | '1':INT
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237248] token='О'
+  [STR] ids=[8342] token='бу'
+  [STR] ids=[236851] token='в'
+  [STR] ids=[31689] token='ница'
+  [STR] ids=[66820] token='▁метал'
+  [STR] ids=[22078] token='личе'
+  [STR] ids=[13173] token='ская'
+  [STR] ids=[46491] token='▁цвет'
+  [STR] ids=[30120] token='▁чер'
+  [STR] ids=[6008] token='ная'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236810,236771,236771] token='500' value=500.0 source_tokens=['5', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236819,236771,236771] token='900' value=900.0 source_tokens=['9', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236800,236770,236771] token='310' value=310.0 source_tokens=['3', '1', '0']
+  [STR] ids=[109750] token='мм'
+  [STR] ids=[49720] token='▁Ти'
+  [STR] ids=[236877] token='п'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236770] token='1' value=1.0
+
+Query 10: Обувница деревянная цвет черный 800х590х300мм б/н
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 0 0
+Compact view: '<bos>':STR | 'О':STR | 'бу':STR | 'в':STR | 'ница':STR | '▁деревя':STR | 'нная':STR | '▁цвет':STR | '▁черный':STR | '▁':STR | '800':INT | 'х':STR | '590':INT | 'х':STR | '300':INT | 'мм':STR | '▁б':STR | '/':STR | 'н':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237248] token='О'
+  [STR] ids=[8342] token='бу'
+  [STR] ids=[236851] token='в'
+  [STR] ids=[31689] token='ница'
+  [STR] ids=[127154] token='▁деревя'
+  [STR] ids=[99838] token='нная'
+  [STR] ids=[46491] token='▁цвет'
+  [STR] ids=[147704] token='▁черный'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236828,236771,236771] token='800' value=800.0 source_tokens=['8', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236810,236819,236771] token='590' value=590.0 source_tokens=['5', '9', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236800,236771,236771] token='300' value=300.0 source_tokens=['3', '0', '0']
+  [STR] ids=[109750] token='мм'
+  [STR] ids=[1469] token='▁б'
+  [STR] ids=[236786] token='/'
+  [STR] ids=[236822] token='н'
+
+Query 11: Стул офисный
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0
+Compact view: '<bos>':STR | 'С':STR | 'ту':STR | 'л':STR | '▁офи':STR | 'сный':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237117] token='С'
+  [STR] ids=[3982] token='ту'
+  [STR] ids=[236853] token='л'
+  [STR] ids=[38598] token='▁офи'
+  [STR] ids=[96738] token='сный'
+
+Query 12: Стол книжка прямоугольный цвет дуб 1200х600х750мм SP-05
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 1 0 0 0 1
+Compact view: '<bos>':STR | 'Сто':STR | 'л':STR | '▁кни':STR | 'жка':STR | '▁прямоуго':STR | 'льный':STR | '▁цвет':STR | '▁ду':STR | 'б':STR | '▁':STR | '1200':INT | 'х':STR | '600':INT | 'х':STR | '750':INT | 'мм':STR | '▁SP':STR | '-':STR | '05':INT
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[127677] token='Сто'
+  [STR] ids=[236853] token='л'
+  [STR] ids=[31243] token='▁кни'
+  [STR] ids=[56540] token='жка'
+  [STR] ids=[224418] token='▁прямоуго'
+  [STR] ids=[17901] token='льный'
+  [STR] ids=[46491] token='▁цвет'
+  [STR] ids=[14551] token='▁ду'
+  [STR] ids=[236915] token='б'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236770,236778,236771,236771] token='1200' value=1200.0 source_tokens=['1', '2', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236825,236771,236771] token='600' value=600.0 source_tokens=['6', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236832,236810,236771] token='750' value=750.0 source_tokens=['7', '5', '0']
+  [STR] ids=[109750] token='мм'
+  [STR] ids=[11446] token='▁SP'
+  [STR] ids=[236772] token='-'
+  [INT] ids=[236771,236810] token='05' value=5.0 source_tokens=['0', '5']
+
+Query 13: Наклейка на стекло для 3D-принтера Raise3D N2/N2 Plus/Pro2/Pro2 Plus BuildTak
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1 0 0 1 0 0 1 0 0 0 1 0 0 1 0 0 0
+Compact view: '<bos>':STR | 'Н':STR | 'ак':STR | 'лей':STR | 'ка':STR | '▁на':STR | '▁стекло':STR | '▁для':STR | '▁':STR | '3':INT | 'D':STR | '-':STR | 'при':STR | 'н':STR | 'тера':STR | '▁Raise':STR | '3':INT | 'D':STR | '▁N':STR | '2':INT | '/':STR | 'N':STR | '2':INT | '▁Plus':STR | '/':STR | 'Pro':STR | '2':INT | '/':STR | 'Pro':STR | '2':INT | '▁Plus':STR | '▁Build':STR | 'Tak':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237240] token='Н'
+  [STR] ids=[9403] token='ак'
+  [STR] ids=[11423] token='лей'
+  [STR] ids=[1173] token='ка'
+  [STR] ids=[1333] token='▁на'
+  [STR] ids=[135936] token='▁стекло'
+  [STR] ids=[4854] token='▁для'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236800] token='3' value=3.0
+  [STR] ids=[236796] token='D'
+  [STR] ids=[236772] token='-'
+  [STR] ids=[10628] token='при'
+  [STR] ids=[236822] token='н'
+  [STR] ids=[25696] token='тера'
+  [STR] ids=[102952] token='▁Raise'
+  [INT] ids=[236800] token='3' value=3.0
+  [STR] ids=[236796] token='D'
+  [STR] ids=[646] token='▁N'
+  [INT] ids=[236778] token='2' value=2.0
+  [STR] ids=[236786] token='/'
+  [STR] ids=[236797] token='N'
+  [INT] ids=[236778] token='2' value=2.0
+  [STR] ids=[12872] token='▁Plus'
+  [STR] ids=[236786] token='/'
+  [STR] ids=[1489] token='Pro'
+  [INT] ids=[236778] token='2' value=2.0
+  [STR] ids=[236786] token='/'
+  [STR] ids=[1489] token='Pro'
+  [INT] ids=[236778] token='2' value=2.0
+  [STR] ids=[12872] token='▁Plus'
+  [STR] ids=[8689] token='▁Build'
+  [STR] ids=[52805] token='Tak'
+
+Query 14: Журнал учета движения путевых листов форма 1-УДП 50л 1шт
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0 0 1 0
+Compact view: '<bos>':STR | 'Ж':STR | 'ур':STR | 'нал':STR | '▁учета':STR | '▁движения':STR | '▁пу':STR | 'те':STR | 'вых':STR | '▁ли':STR | 'стов':STR | '▁форма':STR | '▁':STR | '1':INT | '-':STR | 'У':STR | 'Д':STR | 'П':STR | '▁':STR | '50':INT | 'л':STR | '▁':STR | '1':INT | 'шт':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[238444] token='Ж'
+  [STR] ids=[22740] token='ур'
+  [STR] ids=[34543] token='нал'
+  [STR] ids=[223796] token='▁учета'
+  [STR] ids=[78252] token='▁движения'
+  [STR] ids=[11956] token='▁пу'
+  [STR] ids=[1305] token='те'
+  [STR] ids=[15397] token='вых'
+  [STR] ids=[6377] token='▁ли'
+  [STR] ids=[35098] token='стов'
+  [STR] ids=[48414] token='▁форма'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236770] token='1' value=1.0
+  [STR] ids=[236772] token='-'
+  [STR] ids=[237533] token='У'
+  [STR] ids=[237304] token='Д'
+  [STR] ids=[237134] token='П'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236810,236771] token='50' value=50.0 source_tokens=['5', '0']
+  [STR] ids=[236853] token='л'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236770] token='1' value=1.0
+  [STR] ids=[83507] token='шт'
+
+Query 15: Бланк Путевой лист легкого автомобил форма 3 1шт
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0
+Compact view: '<bos>':STR | 'Б':STR | 'ла':STR | 'нк':STR | '▁Пу':STR | 'те':STR | 'вой':STR | '▁лист':STR | '▁лег':STR | 'кого':STR | '▁автомоби':STR | 'л':STR | '▁форма':STR | '▁':STR | '3':INT | '▁':STR | '1':INT | 'шт':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237359] token='Б'
+  [STR] ids=[1380] token='ла'
+  [STR] ids=[13402] token='нк'
+  [STR] ids=[47908] token='▁Пу'
+  [STR] ids=[1305] token='те'
+  [STR] ids=[11296] token='вой'
+  [STR] ids=[127417] token='▁лист'
+  [STR] ids=[37043] token='▁лег'
+  [STR] ids=[15077] token='кого'
+  [STR] ids=[42533] token='▁автомоби'
+  [STR] ids=[236853] token='л'
+  [STR] ids=[48414] token='▁форма'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236800] token='3' value=3.0
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236770] token='1' value=1.0
+  [STR] ids=[83507] token='шт'
+
+Query 16: Стержень для роллера синий 110мм Montblanc
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0
+Compact view: '<bos>':STR | 'С':STR | 'тер':STR | 'жень':STR | '▁для':STR | '▁ро':STR | 'лле':STR | 'ра':STR | '▁си':STR | 'ний':STR | '▁':STR | '110':INT | 'мм':STR | '▁Mont':STR | 'blanc':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237117] token='С'
+  [STR] ids=[10513] token='тер'
+  [STR] ids=[140885] token='жень'
+  [STR] ids=[4854] token='▁для'
+  [STR] ids=[5519] token='▁ро'
+  [STR] ids=[56360] token='лле'
+  [STR] ids=[956] token='ра'
+  [STR] ids=[6147] token='▁си'
+  [STR] ids=[6044] token='ний'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236770,236770,236771] token='110' value=110.0 source_tokens=['1', '1', '0']
+  [STR] ids=[109750] token='мм'
+  [STR] ids=[8624] token='▁Mont'
+  [STR] ids=[235849] token='blanc'
+
+Query 17: Прибор д/диффузной ароматизации 150м2 AromaVent Нано
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 0 0 0
+Compact view: '<bos>':STR | 'При':STR | 'бор':STR | '▁д':STR | '/':STR | 'ди':STR | 'ф':STR | 'фу':STR | 'зной':STR | '▁аро':STR | 'мати':STR | 'зации':STR | '▁':STR | '150':INT | 'м':STR | '2':INT | '▁Aroma':STR | 'Vent':STR | '▁На':STR | 'но':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[21545] token='При'
+  [STR] ids=[21471] token='бор'
+  [STR] ids=[1167] token='▁д'
+  [STR] ids=[236786] token='/'
+  [STR] ids=[2022] token='ди'
+  [STR] ids=[237074] token='ф'
+  [STR] ids=[56404] token='фу'
+  [STR] ids=[207721] token='зной'
+  [STR] ids=[93468] token='▁аро'
+  [STR] ids=[19872] token='мати'
+  [STR] ids=[26701] token='зации'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236770,236810,236771] token='150' value=150.0 source_tokens=['1', '5', '0']
+  [STR] ids=[236866] token='м'
+  [INT] ids=[236778] token='2' value=2.0
+  [STR] ids=[218764] token='▁Aroma'
+  [STR] ids=[88446] token='Vent'
+  [STR] ids=[8796] token='▁На'
+  [STR] ids=[924] token='но'
+
+Query 18: Увлажнитель-ароматизатор воздуха с подсветкой, Aero 180, белый
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0
+Compact view: '<bos>':STR | 'У':STR | 'вла':STR | 'жни':STR | 'тель':STR | '-':STR | 'а':STR | 'ро':STR | 'мати':STR | 'затор':STR | '▁воздуха':STR | '▁с':STR | '▁подс':STR | 'вет':STR | 'кой':STR | ',':STR | '▁Aero':STR | '▁':STR | '180':INT | ',':STR | '▁белый':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237533] token='У'
+  [STR] ids=[79795] token='вла'
+  [STR] ids=[155200] token='жни'
+  [STR] ids=[6621] token='тель'
+  [STR] ids=[236772] token='-'
+  [STR] ids=[236808] token='а'
+  [STR] ids=[1038] token='ро'
+  [STR] ids=[19872] token='мати'
+  [STR] ids=[204498] token='затор'
+  [STR] ids=[123699] token='▁воздуха'
+  [STR] ids=[937] token='▁с'
+  [STR] ids=[164140] token='▁подс'
+  [STR] ids=[8362] token='вет'
+  [STR] ids=[10071] token='кой'
+  [STR] ids=[236764] token=','
+  [STR] ids=[92877] token='▁Aero'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236770,236828,236771] token='180' value=180.0 source_tokens=['1', '8', '0']
+  [STR] ids=[236764] token=','
+  [STR] ids=[142452] token='▁белый'
+
+Query 19: Зеркало для помещений настенное 700х2000мм
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0
+Compact view: '<bos>':STR | 'З':STR | 'ер':STR | 'ка':STR | 'ло':STR | '▁для':STR | '▁поме':STR | 'щений':STR | '▁на':STR | 'стен':STR | 'ное':STR | '▁':STR | '700':INT | 'х':STR | '2000':INT | 'мм':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237590] token='З'
+  [STR] ids=[1739] token='ер'
+  [STR] ids=[1173] token='ка'
+  [STR] ids=[1600] token='ло'
+  [STR] ids=[4854] token='▁для'
+  [STR] ids=[44447] token='▁поме'
+  [STR] ids=[125903] token='щений'
+  [STR] ids=[1333] token='▁на'
+  [STR] ids=[83273] token='стен'
+  [STR] ids=[9494] token='ное'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236832,236771,236771] token='700' value=700.0 source_tokens=['7', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236778,236771,236771,236771] token='2000' value=2000.0 source_tokens=['2', '0', '0', '0']
+  [STR] ids=[109750] token='мм'
+
+Query 20: Зеркало для комнаты настенное 2000х1100мм
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0
+Compact view: '<bos>':STR | 'З':STR | 'ер':STR | 'ка':STR | 'ло':STR | '▁для':STR | '▁комнаты':STR | '▁на':STR | 'стен':STR | 'ное':STR | '▁':STR | '2000':INT | 'х':STR | '1100':INT | 'мм':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237590] token='З'
+  [STR] ids=[1739] token='ер'
+  [STR] ids=[1173] token='ка'
+  [STR] ids=[1600] token='ло'
+  [STR] ids=[4854] token='▁для'
+  [STR] ids=[183914] token='▁комнаты'
+  [STR] ids=[1333] token='▁на'
+  [STR] ids=[83273] token='стен'
+  [STR] ids=[9494] token='ное'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236778,236771,236771,236771] token='2000' value=2000.0 source_tokens=['2', '0', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236770,236770,236771,236771] token='1100' value=1100.0 source_tokens=['1', '1', '0', '0']
+  [STR] ids=[109750] token='мм'
+
+Query 21: Зеркало для помещений настенное 2000х900мм
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0
+Compact view: '<bos>':STR | 'З':STR | 'ер':STR | 'ка':STR | 'ло':STR | '▁для':STR | '▁поме':STR | 'щений':STR | '▁на':STR | 'стен':STR | 'ное':STR | '▁':STR | '2000':INT | 'х':STR | '900':INT | 'мм':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237590] token='З'
+  [STR] ids=[1739] token='ер'
+  [STR] ids=[1173] token='ка'
+  [STR] ids=[1600] token='ло'
+  [STR] ids=[4854] token='▁для'
+  [STR] ids=[44447] token='▁поме'
+  [STR] ids=[125903] token='щений'
+  [STR] ids=[1333] token='▁на'
+  [STR] ids=[83273] token='стен'
+  [STR] ids=[9494] token='ное'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236778,236771,236771,236771] token='2000' value=2000.0 source_tokens=['2', '0', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236819,236771,236771] token='900' value=900.0 source_tokens=['9', '0', '0']
+  [STR] ids=[109750] token='мм'
+
+Query 22: Зеркало для помещений в раме 2100х800мм
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0
+Compact view: '<bos>':STR | 'З':STR | 'ер':STR | 'ка':STR | 'ло':STR | '▁для':STR | '▁поме':STR | 'щений':STR | '▁в':STR | '▁ра':STR | 'ме':STR | '▁':STR | '2100':INT | 'х':STR | '800':INT | 'мм':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237590] token='З'
+  [STR] ids=[1739] token='ер'
+  [STR] ids=[1173] token='ка'
+  [STR] ids=[1600] token='ло'
+  [STR] ids=[4854] token='▁для'
+  [STR] ids=[44447] token='▁поме'
+  [STR] ids=[125903] token='щений'
+  [STR] ids=[909] token='▁в'
+  [STR] ids=[2384] token='▁ра'
+  [STR] ids=[2648] token='ме'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236778,236770,236771,236771] token='2100' value=2100.0 source_tokens=['2', '1', '0', '0']
+  [STR] ids=[236954] token='х'
+  [INT] ids=[236828,236771,236771] token='800' value=800.0 source_tokens=['8', '0', '0']
+  [STR] ids=[109750] token='мм'
+
+Query 23: Зеркало для помещений в раме высота 2.5 метра, ширина 2,5 метра.
+Type mask (1=INT, 0=STR): 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0
+Compact view: '<bos>':STR | 'З':STR | 'ер':STR | 'ка':STR | 'ло':STR | '▁для':STR | '▁поме':STR | 'щений':STR | '▁в':STR | '▁ра':STR | 'ме':STR | '▁высота':STR | '▁':STR | '2.5':INT | '▁метра':STR | ',':STR | '▁ширина':STR | '▁':STR | '2,5':INT | '▁метра':STR | '.':STR
+Tokens:
+  [STR] ids=[2] token='<bos>'
+  [STR] ids=[237590] token='З'
+  [STR] ids=[1739] token='ер'
+  [STR] ids=[1173] token='ка'
+  [STR] ids=[1600] token='ло'
+  [STR] ids=[4854] token='▁для'
+  [STR] ids=[44447] token='▁поме'
+  [STR] ids=[125903] token='щений'
+  [STR] ids=[909] token='▁в'
+  [STR] ids=[2384] token='▁ра'
+  [STR] ids=[2648] token='ме'
+  [STR] ids=[180455] token='▁высота'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236778,236761,236810] token='2.5' value=2.5 source_tokens=['2', '.', '5']
+  [STR] ids=[164583] token='▁метра'
+  [STR] ids=[236764] token=','
+  [STR] ids=[211020] token='▁ширина'
+  [STR] ids=[236743] token='▁'
+  [INT] ids=[236778,236764,236810] token='2,5' value=2.5 source_tokens=['2', ',', '5']
+  [STR] ids=[164583] token='▁метра'
+  [STR] ids=[236761] token='.'

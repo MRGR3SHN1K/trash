@@ -1,0 +1,6 @@
+{
+  "relevance_scheduler_prompt": "Верни только JSON без пояснений.",
+  "relevance_response_schema": "{\"labels\":[{\"rank\":1,\"relevant\":1},{\"rank\":2,\"relevant\":0}]}",
+  "furniture_scheduler_prompt": "Верни только JSON без пояснений.",
+  "furniture_response_schema": "{\"labels\":[{\"query_index\":0,\"is_furniture\":1},{\"query_index\":1,\"is_furniture\":0}]}"
+}

@@ -1,0 +1,13 @@
+# Large model/checkpoint artifacts are intentionally kept outside GitHub.
+*.pt
+*.ckpt
+*.pth
+*.bin
+*.safetensors
+
+# Common training/vectorization output directories.
+**/checkpoints/
+**/training_artifacts/
+**/continued_training/
+**/catalog_vectors/
+**/_catalog_embedding_shards/
