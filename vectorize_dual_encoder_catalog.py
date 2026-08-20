@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import argparse
+from datetime import timedelta
 import json
 import math
 import os
 from pathlib import Path
+import time
 from typing import Any, Sequence
 
 import numpy as np
@@ -44,6 +46,16 @@ except ImportError:
     tqdm = None
 
 
+CATALOG_MERGE_DONE_FILE_NAME = "catalog_embeddings_merge_done.json"
+
+
+def write_json_atomic(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_name(f"{path.name}.tmp.{os.getpid()}")
+    tmp_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_path.replace(path)
+
+
 class ProductEncoderVectorizationModel:
     def __init__(self, product_encoder: BgeM3ProductCardEncoder) -> None:
         self.product_encoder = product_encoder
@@ -65,19 +77,32 @@ def get_torchrun_context() -> dict[str, int | bool]:
     }
 
 
-def initialize_torchrun_context(context: dict[str, int | bool], device: torch.device) -> None:
+def initialize_torchrun_context(context: dict[str, int | bool], args: argparse.Namespace, device: torch.device) -> None:
     if not bool(context["enabled"]):
         return
     if not torch.distributed.is_available():
         raise RuntimeError("torchrun vectorization requires torch.distributed.")
     if not torch.distributed.is_initialized():
-        backend = "nccl" if device.type == "cuda" else "gloo"
-        torch.distributed.init_process_group(backend=backend)
+        backend = str(args.distributed_backend).lower()
+        if backend == "auto":
+            backend = "gloo"
+        if backend == "nccl" and device.type != "cuda":
+            raise ValueError("--distributed-backend=nccl requires CUDA.")
+        timeout_minutes = max(1, int(args.distributed_timeout_minutes))
+        torch.distributed.init_process_group(
+            backend=backend,
+            timeout=timedelta(minutes=timeout_minutes),
+        )
 
 
-def distributed_barrier_if_needed(context: dict[str, int | bool]) -> None:
+def distributed_barrier_if_needed(context: dict[str, int | bool], device: torch.device | None = None) -> None:
     if bool(context["enabled"]) and torch.distributed.is_initialized():
-        torch.distributed.barrier()
+        backend = str(torch.distributed.get_backend()).lower()
+        if backend == "nccl" and device is not None and device.type == "cuda":
+            device_id = int(device.index) if device.index is not None else int(context["local_rank"])
+            torch.distributed.barrier(device_ids=[device_id])
+        else:
+            torch.distributed.barrier()
 
 
 def distributed_broadcast_object(value: Any, *, context: dict[str, int | bool], src: int = 0) -> Any:
@@ -421,21 +446,17 @@ def encode_catalog_embedding_shard(
             f"GPU {gpu_id} encoded {encoded_count} catalog items, expected {shard_size} "
             f"for range [{start_index}, {end_index})."
         )
-    shard_metadata_path.write_text(
-        json.dumps(
-            {
-                "rank": int(rank),
-                "gpu_id": int(gpu_id),
-                "start_index": int(start_index),
-                "end_index": int(end_index),
-                "encoded_count": int(encoded_count),
-                "embedding_dim": int(model.embedding_dim),
-                "shard_path": str(shard_path),
-            },
-            ensure_ascii=False,
-            indent=2,
-        ),
-        encoding="utf-8",
+    write_json_atomic(
+        shard_metadata_path,
+        {
+            "rank": int(rank),
+            "gpu_id": int(gpu_id),
+            "start_index": int(start_index),
+            "end_index": int(end_index),
+            "encoded_count": int(encoded_count),
+            "embedding_dim": int(model.embedding_dim),
+            "shard_path": str(shard_path),
+        },
     )
 
 
@@ -474,21 +495,17 @@ def _multi_gpu_catalog_worker(
             shape=(0, int(args.embedding_dim)),
         )
         del empty
-        shard_metadata_path.write_text(
-            json.dumps(
-                {
-                    "rank": int(rank),
-                    "gpu_id": int(gpu_id),
-                    "start_index": int(start_index),
-                    "end_index": int(end_index),
-                    "encoded_count": 0,
-                    "embedding_dim": int(args.embedding_dim),
-                    "shard_path": str(shard_path),
-                },
-                ensure_ascii=False,
-                indent=2,
-            ),
-            encoding="utf-8",
+        write_json_atomic(
+            shard_metadata_path,
+            {
+                "rank": int(rank),
+                "gpu_id": int(gpu_id),
+                "start_index": int(start_index),
+                "end_index": int(end_index),
+                "encoded_count": 0,
+                "embedding_dim": int(args.embedding_dim),
+                "shard_path": str(shard_path),
+            },
         )
         return
 
@@ -576,6 +593,142 @@ def merge_catalog_embedding_shards(
         except OSError:
             pass
     return embedding_path
+
+
+def cleanup_torchrun_catalog_sync_files(output_dir: Path, world_size: int) -> None:
+    done_path = output_dir / CATALOG_MERGE_DONE_FILE_NAME
+    if done_path.exists():
+        done_path.unlink()
+    shard_dir = output_dir / "_catalog_embedding_shards"
+    for rank in range(int(world_size)):
+        for path in (
+            shard_dir / f"catalog_embeddings.rank{rank:02d}.float16.npy",
+            shard_dir / f"catalog_embeddings.rank{rank:02d}.json",
+        ):
+            if path.exists():
+                path.unlink()
+        for tmp_path in shard_dir.glob(f"catalog_embeddings.rank{rank:02d}.json.tmp.*"):
+            tmp_path.unlink()
+
+
+def validate_catalog_shard_ready(
+    *,
+    shard_dir: Path,
+    rank: int,
+    expected_range: tuple[int, int],
+    embedding_dim: int,
+) -> str | None:
+    start_index, end_index = expected_range
+    expected_rows = int(end_index) - int(start_index)
+    shard_path = shard_dir / f"catalog_embeddings.rank{rank:02d}.float16.npy"
+    metadata_path = shard_dir / f"catalog_embeddings.rank{rank:02d}.json"
+    if not metadata_path.exists():
+        return f"rank{rank}: metadata is missing"
+    if not shard_path.exists():
+        return f"rank{rank}: shard array is missing"
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except Exception as error:
+        return f"rank{rank}: metadata is not readable yet: {error}"
+    expected_values = {
+        "rank": int(rank),
+        "start_index": int(start_index),
+        "end_index": int(end_index),
+        "encoded_count": int(expected_rows),
+        "embedding_dim": int(embedding_dim),
+    }
+    for key, expected_value in expected_values.items():
+        try:
+            current_value = int(metadata.get(key, -1))
+        except (TypeError, ValueError):
+            return f"rank{rank}: metadata {key}={metadata.get(key)} is not an integer"
+        if current_value != expected_value:
+            return f"rank{rank}: metadata {key}={metadata.get(key)} expected={expected_value}"
+    try:
+        shard = np.load(shard_path, mmap_mode="r")
+        shape = tuple(shard.shape)
+        del shard
+    except Exception as error:
+        return f"rank{rank}: shard array is not readable yet: {error}"
+    if shape != (expected_rows, int(embedding_dim)):
+        return f"rank{rank}: shard shape={shape} expected={(expected_rows, int(embedding_dim))}"
+    return None
+
+
+def wait_for_catalog_shards(
+    *,
+    output_dir: Path,
+    ranges: Sequence[tuple[int, int]],
+    embedding_dim: int,
+    poll_seconds: float,
+    timeout_minutes: float,
+) -> None:
+    shard_dir = output_dir / "_catalog_embedding_shards"
+    pending = set(range(len(ranges)))
+    poll_interval = max(1.0, float(poll_seconds))
+    timeout_seconds = None if float(timeout_minutes) <= 0 else float(timeout_minutes) * 60.0
+    start_time = time.monotonic()
+    last_log_time = 0.0
+    while pending:
+        last_reason = ""
+        ready_ranks: list[int] = []
+        for rank in sorted(pending):
+            reason = validate_catalog_shard_ready(
+                shard_dir=shard_dir,
+                rank=rank,
+                expected_range=ranges[rank],
+                embedding_dim=embedding_dim,
+            )
+            if reason is None:
+                ready_ranks.append(rank)
+            else:
+                last_reason = reason
+        for rank in ready_ranks:
+            pending.remove(rank)
+        if not pending:
+            return
+        now = time.monotonic()
+        if now - last_log_time >= 60.0:
+            done_count = len(ranges) - len(pending)
+            print(
+                f"Waiting for catalog shards: ready={done_count}/{len(ranges)}, "
+                f"pending={sorted(pending)}, last_status={last_reason}",
+                flush=True,
+            )
+            last_log_time = now
+        if timeout_seconds is not None and now - start_time > timeout_seconds:
+            raise TimeoutError(
+                f"Timed out waiting for catalog shards after {timeout_minutes} minutes. "
+                f"Pending ranks: {sorted(pending)}. Last status: {last_reason}"
+            )
+        time.sleep(poll_interval)
+
+
+def wait_for_catalog_merge_done(
+    *,
+    output_dir: Path,
+    poll_seconds: float,
+    timeout_minutes: float,
+    rank: int,
+) -> None:
+    done_path = output_dir / CATALOG_MERGE_DONE_FILE_NAME
+    poll_interval = max(1.0, float(poll_seconds))
+    timeout_seconds = None if float(timeout_minutes) <= 0 else float(timeout_minutes) * 60.0
+    start_time = time.monotonic()
+    last_log_time = 0.0
+    while True:
+        if done_path.exists():
+            payload = json.loads(done_path.read_text(encoding="utf-8"))
+            if not bool(payload.get("ok", False)):
+                raise RuntimeError(f"Catalog merge failed according to {done_path}: {payload}")
+            return
+        now = time.monotonic()
+        if now - last_log_time >= 60.0:
+            print(f"Rank {rank}: waiting for catalog merge marker: {done_path}", flush=True)
+            last_log_time = now
+        if timeout_seconds is not None and now - start_time > timeout_seconds:
+            raise TimeoutError(f"Rank {rank} timed out waiting for catalog merge marker: {done_path}")
+        time.sleep(poll_interval)
 
 
 def encode_catalog_embeddings_multi_gpu(
@@ -682,11 +835,12 @@ def encode_catalog_embeddings_torchrun(
 
     if is_main_process:
         output_dir.mkdir(parents=True, exist_ok=True)
+        cleanup_torchrun_catalog_sync_files(output_dir, world_size)
         print(
             f"torchrun catalog vectorization: world_size={world_size}, catalog_size={catalog_size}",
             flush=True,
         )
-    distributed_barrier_if_needed(context)
+    distributed_barrier_if_needed(context, device=device)
 
     ranges = split_catalog_ranges(catalog_size, world_size)
     start_index, end_index = ranges[rank]
@@ -705,21 +859,17 @@ def encode_catalog_embeddings_torchrun(
             shape=(0, embedding_dim),
         )
         del empty
-        shard_metadata_path.write_text(
-            json.dumps(
-                {
-                    "rank": rank,
-                    "gpu_id": int(gpu_id),
-                    "start_index": int(start_index),
-                    "end_index": int(end_index),
-                    "encoded_count": 0,
-                    "embedding_dim": int(embedding_dim),
-                    "shard_path": str(shard_path),
-                },
-                ensure_ascii=False,
-                indent=2,
-            ),
-            encoding="utf-8",
+        write_json_atomic(
+            shard_metadata_path,
+            {
+                "rank": rank,
+                "gpu_id": int(gpu_id),
+                "start_index": int(start_index),
+                "end_index": int(end_index),
+                "encoded_count": 0,
+                "embedding_dim": int(embedding_dim),
+                "shard_path": str(shard_path),
+            },
         )
         loaded_state_source = "empty_shard"
     else:
@@ -752,8 +902,14 @@ def encode_catalog_embeddings_torchrun(
         if device.type == "cuda":
             torch.cuda.empty_cache()
 
-    distributed_barrier_if_needed(context)
     if is_main_process:
+        wait_for_catalog_shards(
+            output_dir=output_dir,
+            ranges=ranges,
+            embedding_dim=embedding_dim,
+            poll_seconds=args.catalog_shard_wait_poll_seconds,
+            timeout_minutes=args.catalog_shard_wait_timeout_minutes,
+        )
         embedding_path = merge_catalog_embedding_shards(
             output_dir=output_dir,
             embedding_dim=embedding_dim,
@@ -763,7 +919,23 @@ def encode_catalog_embeddings_torchrun(
             keep_shards=args.keep_catalog_shards,
         )
         manifest_path.write_text(json.dumps(expected_manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-    distributed_barrier_if_needed(context)
+        write_json_atomic(
+            output_dir / CATALOG_MERGE_DONE_FILE_NAME,
+            {
+                "ok": True,
+                "embedding_path": str(embedding_path),
+                "catalog_size": int(catalog_size),
+                "embedding_dim": int(embedding_dim),
+                "world_size": int(world_size),
+            },
+        )
+    else:
+        wait_for_catalog_merge_done(
+            output_dir=output_dir,
+            poll_seconds=args.catalog_shard_wait_poll_seconds,
+            timeout_minutes=args.catalog_shard_wait_timeout_minutes,
+            rank=rank,
+        )
     return embedding_path, loaded_state_source
 
 
@@ -771,7 +943,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Precompute full product-catalog embeddings for one or more dual-encoder checkpoints."
     )
-    parser.add_argument("--data-dir", required=True, help="Directory containing data0001.parquet ... data0029.parquet")
+    parser.add_argument("--data-dir", required=True, help="Directory containing source files named data<digits>.parquet")
     parser.add_argument("--checkpoint-path", nargs="+", required=True, help="One or more checkpoint directories or checkpoint metadata/full-model paths. Product encoder sidecar weights are loaded automatically when present.")
     parser.add_argument("--tokenizer-path", default=None, help="Optional tokenizer override. By default it is restored from checkpoint metadata.")
     parser.add_argument("--catalog-vector-root", "--output-dir", dest="catalog_vector_root", default=None, help="Optional root for vectors. If omitted, vectors are saved to <checkpoint_dir>/catalog_vectors.")
@@ -787,6 +959,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--product-max-features", type=int, default=14, help="How many product features to pass into the product encoder")
     parser.add_argument("--product-max-length", type=int, default=1024, help="Maximum product sequence length for the product encoder")
     parser.add_argument("--reuse-catalog-cache", action=argparse.BooleanOptionalAction, default=True, help="Reuse existing vectors when manifest matches")
+    parser.add_argument("--distributed-backend", choices=("auto", "gloo", "nccl"), default="gloo", help="torchrun synchronization backend. gloo is the default because vectorization only needs CPU-side broadcast/barrier.")
+    parser.add_argument("--distributed-timeout-minutes", type=int, default=360, help="torchrun collective timeout. Large catalogs can have slow shards that finish much later than fast shards.")
+    parser.add_argument("--catalog-shard-wait-poll-seconds", type=float, default=10.0, help="How often rank0 checks per-rank shard files after torchrun encoding.")
+    parser.add_argument("--catalog-shard-wait-timeout-minutes", type=float, default=0.0, help="Timeout for file-based shard/merge waiting. Use 0 to wait indefinitely.")
     parser.add_argument("--cache-dir", default=None, help="Optional cache directory for downloaded checkpoints")
     return parser.parse_args()
 
@@ -799,7 +975,7 @@ def main() -> None:
         is_main_process = bool(torchrun_context["is_main_process"])
         if torchrun_enabled:
             device, torchrun_gpu_id = resolve_torchrun_device(args, torchrun_context)
-            initialize_torchrun_context(torchrun_context, device)
+            initialize_torchrun_context(torchrun_context, args, device)
             gpu_ids: list[int] = []
             if device.type == "cuda":
                 gpu_ids = parse_gpu_id_list(args.gpu_ids) or list(range(int(torchrun_context["world_size"])))
@@ -858,7 +1034,7 @@ def main() -> None:
 
             if is_main_process:
                 vector_dir.mkdir(parents=True, exist_ok=True)
-            distributed_barrier_if_needed(torchrun_context)
+            distributed_barrier_if_needed(torchrun_context, device=device)
             model_cache_dir = Path(args.cache_dir) / model_output_name if args.cache_dir else vector_dir / "cache"
             model_cache_dir.mkdir(parents=True, exist_ok=True)
 
@@ -890,7 +1066,7 @@ def main() -> None:
 
             if is_main_process:
                 save_feature_frequency(vector_dir, feature_frequency)
-            distributed_barrier_if_needed(torchrun_context)
+            distributed_barrier_if_needed(torchrun_context, device=device)
 
             if torchrun_enabled:
                 embedding_path, loaded_state_source = encode_catalog_embeddings_torchrun(
@@ -965,6 +1141,10 @@ def main() -> None:
                 "dynamic_catalog_batching": bool(args.dynamic_catalog_batching),
                 "catalog_token_budget": int(args.catalog_token_budget),
                 "catalog_chars_per_token": float(args.catalog_chars_per_token),
+                "distributed_backend": str(args.distributed_backend),
+                "distributed_timeout_minutes": int(args.distributed_timeout_minutes),
+                "catalog_shard_wait_poll_seconds": float(args.catalog_shard_wait_poll_seconds),
+                "catalog_shard_wait_timeout_minutes": float(args.catalog_shard_wait_timeout_minutes),
                 "safetensors_available": SAFETENSORS_AVAILABLE,
                 "loaded_state_source": loaded_state_source,
                 "product_encoder_state_path": checkpoint_payload.get("product_encoder_state_path"),

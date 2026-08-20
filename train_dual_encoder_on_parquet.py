@@ -65,6 +65,7 @@ SKU_COLUMN = "sku"
 SKU_ERROR_COLUMN = "sku_error"
 DESCRIPTION_COLUMN_CANDIDATES = ("description", "text", "body", "full_text")
 DATA_FILE_TEMPLATE = "data{index:04d}.parquet"
+DATA_FILE_RE = re.compile(r"^data(\d+)\.parquet$")
 DEFAULT_PRODUCT_MAX_FEATURES = 14
 
 NAME_KEYS = {"name", "feature", "feature name", "attribute", "characteristic", "title", "key"}
@@ -456,13 +457,15 @@ def detect_description_column(columns: Sequence[str]) -> str | None:
 
 
 def iter_source_parquet_files(data_dir: Path) -> list[Path]:
-    files = []
-    for index in range(1, 30):
-        candidate = data_dir / DATA_FILE_TEMPLATE.format(index=index)
-        if candidate.exists():
-            files.append(candidate)
+    matched_files: list[tuple[int, str, Path]] = []
+    for candidate in data_dir.glob("data*.parquet"):
+        match = DATA_FILE_RE.fullmatch(candidate.name)
+        if match is None:
+            continue
+        matched_files.append((int(match.group(1)), candidate.name, candidate))
+    files = [path for _index, _name, path in sorted(matched_files, key=lambda item: (item[0], item[1]))]
     if not files:
-        raise FileNotFoundError(f"No source parquet files data0001..data0029 found in {data_dir}")
+        raise FileNotFoundError(f"No source parquet files matching data<digits>.parquet found in {data_dir}")
     return files
 
 
@@ -1682,7 +1685,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Prepare parquet corpus and train a query/product dual-encoder with in-batch negatives."
     )
-    parser.add_argument("--data-dir", required=True, help="Directory containing data0001.parquet ... data0029.parquet")
+    parser.add_argument("--data-dir", required=True, help="Directory containing source files named data<digits>.parquet")
     parser.add_argument("--tokenizer-path", default="tokenizer (1).json", help="Path to tokenizer json")
     parser.add_argument("--output-dir", "--save-dir", dest="output_dir", default=None, help="Directory for checkpoints, logs and metrics. Defaults to <data-dir>/training_artifacts")
     parser.add_argument("--train-ratio", type=float, default=0.8, help="Train split ratio")

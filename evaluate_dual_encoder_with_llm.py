@@ -2884,7 +2884,7 @@ def build_threshold_report_rows(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Evaluate a dual-encoder against the full parquet catalog using LLM binary judgements.")
-    parser.add_argument("--data-dir", required=True, help="Directory containing data0001.parquet ... data0029.parquet")
+    parser.add_argument("--data-dir", required=True, help="Directory containing source files named data<digits>.parquet")
     parser.add_argument("--checkpoint-path", nargs="+", required=True, help="One or more checkpoint directories or .pt/.safetensors/.model.pt paths")
     parser.add_argument("--tokenizer-path", default=None, help="Optional tokenizer override. By default it is restored from the checkpoint metadata.")
     parser.add_argument("--positions-xlsx", required=True, help="Path to the Excel file with procurement positions.")
@@ -3228,6 +3228,7 @@ def evaluate_single_checkpoint(
         "positions_xlsx": str(args.positions_xlsx),
         "positions_count": len(positions),
         "furniture_positions_count": int(sum(int(label) for label in furniture_labels)),
+        "furniture_split_enabled": False,
         "catalog_size": catalog_size,
         "checkpoint_path": checkpoint_path,
         "tokenizer_path": tokenizer_path,
@@ -3329,21 +3330,7 @@ def main() -> None:
     )
     shared_query_frame.to_parquet(shared_output_dir / "evaluation_positions.parquet", index=False)
 
-    furniture_labels = ensure_furniture_labels(
-        positions=positions,
-        output_dir=shared_output_dir,
-        ws_url=args.scheduler_ws_url,
-        model_name=args.scheduler_model,
-        llm_chunk_size=args.furniture_llm_chunk_size,
-        max_in_flight=args.furniture_llm_max_in_flight,
-        temperature=args.llm_temperature,
-        max_tokens=args.llm_max_tokens,
-        max_attempts=args.llm_max_attempts,
-        request_timeout_seconds=args.llm_request_timeout_seconds,
-        scheduler_connect_timeout_seconds=args.scheduler_connect_timeout_seconds,
-        save_prompt_bodies=args.save_llm_prompt_bodies,
-        save_raw_responses=args.save_llm_raw_responses,
-    )
+    furniture_labels = [1] * len(positions)
 
     shared_query_frame = shared_query_frame.copy()
     shared_query_frame["is_furniture_query"] = [int(value) for value in furniture_labels]
@@ -3389,6 +3376,7 @@ def main() -> None:
         "positions_xlsx": str(args.positions_xlsx),
         "positions_count": len(positions),
         "furniture_positions_count": int(sum(int(label) for label in furniture_labels)),
+        "furniture_split_enabled": False,
         "catalog_size": int(all_model_results[0]["catalog_size"]) if all_model_results else 0,
         "checkpoint_paths": checkpoint_paths,
         "model_outputs": [

@@ -1,0 +1,122 @@
+Dual Encoder для поиска товаров по закупочным запросам
+
+Суть проекта
+Проект строит retrieval-пайплайн для поиска подходящих карточек товаров по текстовому запросу закупки.
+Идея: обучить два энкодера, которые переводят закупочный запрос и карточку товара в L2-нормализованные векторы одной размерности. После этого товары ранжируются по cosine similarity.
+
+Основной сценарий
+1. Есть база товаров в parquet-файлах вида data<digits>.parquet.
+2. В каждой строке есть title, features, sku и sku_error.
+3. title и features описывают товар.
+4. sku содержит до 5 позитивных текстовых запросов для этого товара.
+5. Строки с sku_error != None исключаются из обучения.
+6. Модель учится сближать запросы из sku с правильной карточкой товара и отдалять товары из других строк батча.
+7. После обучения product encoder заранее векторизует всю базу товаров.
+8. На eval query encoder векторизует закупочные позиции, затем весь каталог ранжируется по cosine similarity.
+9. LLM judge оценивает retrieved candidates как 1 или 0.
+10. По LLM-разметке считаются retrieval-метрики и формируются match-файлы.
+
+Архитектура V4
+Модель состоит из двух энкодеров:
+
+Query encoder
+- кодирует текст закупочного запроса;
+- использует dual-path обработку INT и STR токенов;
+- имеет обучаемый token type router;
+- числовые span-кандидаты собираются дифференцируемым numeric merge;
+- query encoder использует full attention;
+- на выходе дает 1024-d нормализованный embedding.
+
+Product encoder
+- кодирует карточку товара;
+- принимает title, description и до 14 характеристик;
+- каждая характеристика имеет name и value;
+- value может быть строковым или числовым;
+- INT и STR поток сохраняются, между ними есть cross-attention;
+- title и description несут основной текстовый контекст;
+- product encoder использует sparse/local attention в стиле Longformer;
+- title/description/feature-name токены могут быть глобальными;
+- routing-кластеры используются для оптимизации внимания;
+- на выходе дает 1024-d нормализованный embedding.
+
+Числа и токены
+Старый эвристический разбор токена заменен на обучаемую маршрутизацию.
+Если tokenizer разбивает число 600 как 6 0 0, numeric merge должен собрать числовой span 600.
+Для чисел используется log-трансформация и многочастотное кодирование.
+Цель: модель должна понимать не только текстовую форму, но и числовую величину.
+
+Обучение
+Обучение идет как multi-positive contrastive learning.
+В батче N товаров, каждый товар дает до 5 позитивных запросов.
+Для конкретного товара его 5 запросов являются позитивами.
+Остальные 5 * (N - 1) запросов из батча являются in-batch negatives.
+Loss сделан мягким, с учетом того, что часть негативов теоретически может быть релевантной.
+Поддерживается динамический batching, gradient clipping, AMP, multi-GPU/FSDP режимы и сохранение checkpoint-ов.
+
+Векторизация каталога
+vectorize_dual_encoder_catalog.py заранее прогоняет весь каталог через product encoder.
+Скрипт читает все parquet-файлы вида data<digits>.parquet, а не только data0001...data0029.
+На 8 GPU каталог делится на shard-ы.
+Каждый rank пишет свой shard, затем rank0 дожидается всех shard-файлов через файловую систему и делает merge.
+Это сделано, чтобы быстрые GPU не падали на distributed barrier, пока медленные GPU еще считают.
+
+LLM eval
+evaluate_dual_encoder_with_llm.py делает оценку качества:
+- загружает checkpoint dual encoder;
+- загружает precomputed catalog vectors;
+- векторизует закупочные запросы;
+- ранжирует весь каталог по cosine similarity;
+- считает softmax/logsumexp по full catalog scores;
+- отправляет top retrieved candidates в LLM judge;
+- получает бинарные оценки 1/0;
+- считает top-k, top-p, score-threshold и probability-threshold метрики;
+- сохраняет aggregate metrics, per-query metrics, raw LLM logs и match-файлы.
+
+Важно по eval
+Furniture/non-furniture split сейчас отключен.
+Все запросы считаются одной общей выборкой.
+Поля furniture_only в отчетах могут совпадать с all_queries.
+
+Ключевые команды
+
+Векторизация каталога на 8 GPU:
+torchrun --nproc_per_node=8 vectorize_dual_encoder_catalog.py \
+  --data-dir /home/jovyan/pasha/data/data1 \
+  --checkpoint-path /home/jovyan/pasha/dual_encoder_runs/run_v4_multi_positive/last_checkpoint.pt \
+  --tokenizer-path /home/jovyan/pasha/models/gemma-3-27b-it/tokenizer.json \
+  --device cuda \
+  --no-reuse-catalog-cache
+
+LLM eval:
+python evaluate_dual_encoder_with_llm.py \
+  --data-dir /home/jovyan/pasha/data/data1 \
+  --checkpoint-path /home/jovyan/pasha/dual_encoder_runs/run_v4_multi_positive/last_checkpoint.pt \
+  --tokenizer-path /home/jovyan/pasha/models/gemma-3-27b-it/tokenizer.json \
+  --positions-xlsx /home/jovyan/pasha/big_model/dual_encoder_training/bentch.xlsx \
+  --output-dir /home/jovyan/pasha/eval_runs/run_v4_multi_positive \
+  --device cuda:0 \
+  --retrieval-pool-size 100 \
+  --top-k 1,3,5,10,20,50,100 \
+  --top-p 0.5,0.8,0.9,0.95 \
+  --score-thresholds 0.2,0.3,0.4 \
+  --probability-thresholds 0.01,0.02 \
+  --llm-max-in-flight 160 \
+  --llm-max-attempts 5 \
+  --llm-request-timeout-seconds 300 \
+  --no-reuse-llm-labels \
+  --save-llm-raw-responses \
+  --save-llm-prompt-bodies
+
+Основные выходные файлы eval
+- aggregate_metrics.json
+- aggregate_metrics_by_threshold.csv
+- model_comparison_metrics.csv
+- per_query_metrics.parquet
+- query_to_matching_files.csv
+- query_to_best_matching_file.csv
+- procurement_expert_llm_answers.log
+- llm_judgement_raw.jsonl
+
+Что не нужно коммитить
+Не нужно хранить в git checkpoint-и, safetensors, .pt, .ckpt, catalog vectors, training artifacts и большие eval artifacts.
+Они должны оставаться вне репозитория и храниться отдельно.
